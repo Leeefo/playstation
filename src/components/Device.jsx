@@ -15,6 +15,8 @@ const Device = ({ deviceNumber }) => {
   const [endTime, setEndTime] = useState(0)
   const [id, setId] = useState(0)
   const [controller, setController] = useState(15)
+  const [time, setTime] = useState(0)
+  const [cost, setCost] = useState(0)
 
 
   const convertTime = (ms) => {
@@ -47,6 +49,8 @@ const Device = ({ deviceNumber }) => {
     clearInterval(id)
     setEndTime(0)
     setStartTime(0)
+    setTime(0)
+    setCost(0)
 
   }
 
@@ -80,6 +84,11 @@ const Device = ({ deviceNumber }) => {
             setStarted={setStarted}
             started={started}
             handleEnd={handleEnd}
+            time={time}
+            setTime={setTime}
+            convertTime={convertTime}
+            setCost={setCost}
+            cost={cost}
 
           />
 
@@ -97,11 +106,11 @@ const Device = ({ deviceNumber }) => {
             {endTime ? (endTime.toLocaleString().slice(10, -3)) : 0}
           </Typography>
           <Typography>
-            {(startTime && endTime) ?
-              convertTime(endTime - startTime) : `0:0:0`}
+            {(time) ?
+              time : `0:0:0`}
           </Typography>
           <Typography>
-            {`${Math.round(((endTime - startTime) / (1000 * 60 * 60)) * controller)} L.E`}
+            {`${cost} L.E`}
           </Typography>
         </AccordionDetails>
 

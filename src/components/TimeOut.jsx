@@ -21,10 +21,16 @@ const style = {
 const TimeOut = ({
   handleOpenTimeOut,
   setOpenTimeOut,
-  openTimeOut
+  openTimeOut,
+  cost, time,
+  endTime, startTime
 }) => {
 
   const handleCloseTimeOut = () => setOpenTimeOut(false);
+
+  const handleSave = () => {
+    handleCloseTimeOut()
+  }
 
   return (
     <div>
@@ -33,12 +39,27 @@ const TimeOut = ({
         onClose={handleCloseTimeOut}
       >
         <Box sx={style}>
+
+
           <Typography variant="h6" component="h2">
-            Text in a modal
+            Device Time Out
           </Typography>
+
+          {/* EndTime: {endTime}
+            Time: {time}
+            Cost: {cost} */}
           <Typography sx={{ mt: 2 }}>
-            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+            Start Time: {2 * 6}
+
           </Typography>
+          <Button
+            sx={{ mt: 2 }}
+            variant="contained"
+            onClick={handleSave}
+          >
+            Save
+          </Button>
+
         </Box>
       </Modal>
     </div>

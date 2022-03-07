@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Howl } from 'howler';
 import TimeOut from './TimeOut';
 
@@ -44,7 +44,8 @@ const NewTime = ({
   endTime, setEndTime,
   setId,
   started, setStarted,
-  handleEnd
+  handleEnd,
+  setCost, setTime, convertTime, time, cost
 
 }) => {
 
@@ -54,6 +55,14 @@ const NewTime = ({
   const [inputHours, setInputHours] = useState('')
   const [inputMinutes, setInputMinutes] = useState('')
   const [openTimeOut, setOpenTimeOut] = useState(false);
+
+  useEffect(() => {
+    setTime(convertTime(endTime - startTime))
+    setCost(Math.round(((endTime - startTime) / (1000 * 60 * 60)) * controller))
+
+
+  }, [endTime])
+
 
 
   const handleOpen = () => setOpen(true);
@@ -88,6 +97,7 @@ const NewTime = ({
         handleOpenTimeOut()
         playSound(soundSrc)
         handleEnd()
+        setStarted(false)
       }, timeSetted)
 
     } else {
@@ -98,6 +108,8 @@ const NewTime = ({
       setId(
         setInterval(() => {
           setEndTime(new Date())
+
+
         }, 3000)
       )
     }
@@ -116,11 +128,19 @@ const NewTime = ({
 
   return (
     <div>
+
       <TimeOut
         openTimeOut={openTimeOut}
         setOpenTimeOut={setOpenTimeOut}
         handleOpenTimeOut={handleOpenTimeOut}
+        startTime={startTime}
+        endTime={endTime}
+        time={time}
+        cost={cost}
       />
+
+
+
       <Button
         style={!started ? { display: "block" } : { display: "none" }}
 
