@@ -17,6 +17,21 @@ import Switch from '@mui/material/Switch';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import TextField from '@mui/material/TextField';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+
+  timeIntervalId,
+  start,
+  end,
+  started,
+  reset,
+  timeSetter,
+  costSetter,
+} from './../features/time/timeSlice';
+
+
+
+
 
 const style = {
   position: 'absolute',
@@ -38,16 +53,9 @@ const playSound = (src) => {
   sound.play()
 }
 
-const NewTime = ({
-  controller, setController,
-  startTime, setStartTime,
-  endTime, setEndTime,
-  setId,
-  started, setStarted,
-  handleEnd,
-  setCost, setTime, convertTime, time, cost
+const NewTime = ({ deviceNumber }) => {
 
-}) => {
+  const dispatch = useDispatch()
 
   const [open, setOpen] = useState(false);
 
@@ -55,13 +63,44 @@ const NewTime = ({
   const [inputHours, setInputHours] = useState('')
   const [inputMinutes, setInputMinutes] = useState('')
   const [openTimeOut, setOpenTimeOut] = useState(false);
+  const [controller, setController] = useState(15)
+
+  const endTime = useSelector((state) => state.time[deviceNumber].endTime)
+  const startTime = useSelector((state) => state.time[deviceNumber].startTime)
+  const isStarted = useSelector((state) => state.time[deviceNumber].isStarted);
 
   useEffect(() => {
-    setTime(convertTime(endTime - startTime))
-    setCost(Math.round(((endTime - startTime) / (1000 * 60 * 60)) * controller))
-
+    dispatch(timeSetter({
+      deviceNumber,
+      time: convertTime(endTime - startTime)
+    }))
+    dispatch(costSetter({
+      deviceNumber,
+      cost: Math.round(((endTime - startTime) / (1000 * 60 * 60)) * controller)
+    }))
 
   }, [endTime])
+
+
+
+
+  const convertTime = (ms) => {
+
+    let first = (ms / (1000 * 60 * 60)).toString().split('.');
+    let second = (Number(['0', first[1]].join('.')) * 60).toString().split('.');
+    let third = Math.round(Number(['0', second[1]].join('.')) * 60).toString()
+
+    if (third === 60) {
+      third = 0;
+      second[0] = Number(second[0]) + 1
+    }
+    if (second[0] === 60) {
+      second = 0;
+      first[0] = Number(first[0]) + 1
+
+    }
+    return (`${first[0]}:${second[0]}:${third}`)
+  }
 
 
 
@@ -73,6 +112,7 @@ const NewTime = ({
     setController(15)
   }
   const handleOpenTimeOut = () => setOpenTimeOut(true);
+  const handleCloseTimeOut = () => setOpenTimeOut(false);
 
 
 
@@ -88,34 +128,42 @@ const NewTime = ({
 
     if (!timeSwitch) {
       const timeSetted = (inputHours) * (60 * 60 * 1000) + (inputMinutes) * (60 * 1000);
-      setStarted(!started);
-      setStartTime(new Date());
-      setEndTime(new Date(new Date().getTime()
-        + timeSetted
-      ));
+      dispatch(started({
+        deviceNumber,
+        deviceStarted: true
+      }));
+      dispatch(start(deviceNumber));
+      dispatch(
+        end(
+          {
+            time: (new Date().getTime()) + timeSetted,
+            deviceNumber
+          }
+        ));
+      handleClose()
       setTimeout(() => {
         handleOpenTimeOut()
         playSound(soundSrc)
-        handleEnd()
-        setStarted(false)
+        dispatch(reset(deviceNumber))
       }, timeSetted)
 
     } else {
-      setStarted(!started)
+      dispatch(started({
+        deviceNumber,
+        deviceStarted: true
+      }))
 
-      setStartTime(new Date());
-      setEndTime(new Date());
-      setId(
-        setInterval(() => {
-          setEndTime(new Date())
-
-
-        }, 3000)
+      dispatch(start(deviceNumber));
+      dispatch(end({ deviceNumber }));
+      dispatch(
+        timeIntervalId({
+          deviceNumber,
+          intervalId: setInterval(() => { dispatch(end({ deviceNumber })) }, 3000)
+        })
       )
+
+      handleClose()
     }
-
-
-    handleClose()
   }
 
   const handleInputHours = (e) => {
@@ -130,19 +178,16 @@ const NewTime = ({
     <div>
 
       <TimeOut
+        handleOpenTimeOut={handleOpenTimeOut}
         openTimeOut={openTimeOut}
         setOpenTimeOut={setOpenTimeOut}
-        handleOpenTimeOut={handleOpenTimeOut}
-        startTime={startTime}
-        endTime={endTime}
-        time={time}
-        cost={cost}
+        handleCloseTimeOut={handleCloseTimeOut}
       />
 
 
 
       <Button
-        style={!started ? { display: "block" } : { display: "none" }}
+        style={!isStarted ? { display: "block" } : { display: "none" }}
 
         variant='contained'
         onClick={handleOpen}>

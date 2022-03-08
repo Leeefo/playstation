@@ -1,4 +1,3 @@
-import React, { useState } from 'react'
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -19,14 +18,11 @@ const style = {
 };
 
 const TimeOut = ({
-  handleOpenTimeOut,
-  setOpenTimeOut,
   openTimeOut,
-  cost, time,
-  endTime, startTime
+  handleCloseTimeOut
+
 }) => {
 
-  const handleCloseTimeOut = () => setOpenTimeOut(false);
 
   const handleSave = () => {
     handleCloseTimeOut()
