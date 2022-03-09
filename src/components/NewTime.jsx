@@ -53,7 +53,7 @@ const playSound = (src) => {
   sound.play()
 }
 
-const NewTime = ({ deviceNumber }) => {
+const NewTime = ({ deviceNumber, handleOpenTimeOut, openTimeOut, setOpenTimeOut }) => {
 
   const dispatch = useDispatch()
 
@@ -62,7 +62,6 @@ const NewTime = ({ deviceNumber }) => {
   const [timeSwitch, setTimeSwitch] = useState(true)
   const [inputHours, setInputHours] = useState('')
   const [inputMinutes, setInputMinutes] = useState('')
-  const [openTimeOut, setOpenTimeOut] = useState(false);
   const [controller, setController] = useState(15)
 
   const endTime = useSelector((state) => state.time[deviceNumber].endTime)
@@ -111,8 +110,7 @@ const NewTime = ({ deviceNumber }) => {
     setInputMinutes('')
     setController(15)
   }
-  const handleOpenTimeOut = () => setOpenTimeOut(true);
-  const handleCloseTimeOut = () => setOpenTimeOut(false);
+
 
 
 
@@ -144,7 +142,7 @@ const NewTime = ({ deviceNumber }) => {
       setTimeout(() => {
         handleOpenTimeOut()
         playSound(soundSrc)
-        dispatch(reset(deviceNumber))
+
       }, timeSetted)
 
     } else {
@@ -181,7 +179,7 @@ const NewTime = ({ deviceNumber }) => {
         handleOpenTimeOut={handleOpenTimeOut}
         openTimeOut={openTimeOut}
         setOpenTimeOut={setOpenTimeOut}
-        handleCloseTimeOut={handleCloseTimeOut}
+        deviceNumber={deviceNumber}
       />
 
 

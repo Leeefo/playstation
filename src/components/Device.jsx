@@ -5,15 +5,18 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   reset
 } from './../features/time/timeSlice';
 
 import NewTime from './NewTime';
+import TimeOut from './TimeOut';
 
 const Device = ({ deviceNumber }) => {
 
+  const [openTimeOut, setOpenTimeOut] = useState(false);
 
 
   const dispatch = useDispatch()
@@ -31,10 +34,10 @@ const Device = ({ deviceNumber }) => {
 
 
 
-
+  const handleOpenTimeOut = () => setOpenTimeOut(true);
 
   const handleEnd = () => {
-    dispatch(reset(deviceNumber))
+    handleOpenTimeOut()
     clearInterval(intervalId)
 
 
@@ -42,6 +45,14 @@ const Device = ({ deviceNumber }) => {
 
   return (
     <>
+
+      <TimeOut
+        deviceNumber={deviceNumber}
+        handleOpenTimeOut={handleOpenTimeOut}
+        openTimeOut={openTimeOut}
+
+        setOpenTimeOut={setOpenTimeOut}
+      />
 
 
       <Accordion>
@@ -59,7 +70,12 @@ const Device = ({ deviceNumber }) => {
 
 
 
-          <NewTime deviceNumber={deviceNumber} />
+          <NewTime
+            handleOpenTimeOut={handleOpenTimeOut}
+            openTimeOut={openTimeOut}
+            deviceNumber={deviceNumber}
+            setOpenTimeOut={setOpenTimeOut}
+          />
 
 
           <Button variant="contained"

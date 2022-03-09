@@ -1,5 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+
+const setDailyId = (lastId, startTime) => {
+
+    const newIdDate = "D" + new Date(startTime).toLocaleString().slice(0, -12).split('/').join('')
+    if (lastId.slice(1) === newIdDate) {
+        return (Number(lastId[0]) + 1) + newIdDate
+    } else {
+        return 1 + newIdDate
+    }
+
+}
+
+
 const initialState =
 
     [
@@ -37,6 +50,7 @@ const initialState =
             intervalId: null
 
         },
+        "0"
 
     ]
 
@@ -46,6 +60,8 @@ export const timeSlice = createSlice({
     reducers: {
         start: (state, { payload }) => {
             state[payload].startTime = new Date().getTime();
+            state[state.length - 1] = setDailyId(state[state.length - 1], state[payload].startTime);
+            console.log(state[state.length - 1])
         },
         end: (state, { payload }) => {
             state[payload.deviceNumber].endTime = new Date(payload.time ?? new Date()).getTime();
@@ -68,12 +84,15 @@ export const timeSlice = createSlice({
         },
         costSetter: (state, { payload }) => {
             state[payload.deviceNumber].cost = payload.cost
+        },
+        dailyIdSetter: (state, { payload }) => {
+            state[state.length - 1] = payload
         }
 
     }
 })
 
-export const { start, end, started, timeIntervalId, reset, timeSetter, costSetter } = timeSlice.actions;
+export const { dailyIdSetter, start, end, started, timeIntervalId, reset, timeSetter, costSetter } = timeSlice.actions;
 
 
 export default timeSlice.reducer;
