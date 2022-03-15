@@ -49,6 +49,7 @@ const TimeOut = ({
     }
 
     try {
+      console.log(newRecord)
       await playRecordsServices.addRecord(newRecord);
     } catch (error) {
       console.log(error)

@@ -24,9 +24,9 @@ import {
   start,
   end,
   started,
-  reset,
   timeSetter,
   costSetter,
+  openSwitchSetter
 } from './../features/time/timeSlice';
 
 
@@ -63,10 +63,12 @@ const NewTime = ({ deviceNumber, handleOpenTimeOut, openTimeOut, setOpenTimeOut 
   const [inputHours, setInputHours] = useState('')
   const [inputMinutes, setInputMinutes] = useState('')
   const [controller, setController] = useState(15)
+  const [defaultState, setDefaultState] = useState("")
 
-  const endTime = useSelector((state) => state.time[deviceNumber].endTime)
-  const startTime = useSelector((state) => state.time[deviceNumber].startTime)
-  const isStarted = useSelector((state) => state.time[deviceNumber].isStarted);
+  let endTime = useSelector((state) => state.time[deviceNumber].endTime)
+  let startTime = useSelector((state) => state.time[deviceNumber].startTime)
+  let isStarted = useSelector((state) => state.time[deviceNumber].isStarted);
+  let isOpen = useSelector((state) => state.time[deviceNumber].isOpen);
 
   useEffect(() => {
     dispatch(timeSetter({
@@ -79,6 +81,39 @@ const NewTime = ({ deviceNumber, handleOpenTimeOut, openTimeOut, setOpenTimeOut 
     }))
 
   }, [endTime])
+
+  useEffect(() => {
+
+    setDefaultState(isOpen)
+
+    console.log("in useEffect", endTime, startTime, isStarted, isOpen)
+    if (defaultState !== "default") {
+      if (isStarted) {
+        if (isOpen) {
+
+          dispatch(
+            timeIntervalId({
+              deviceNumber,
+              intervalId: setInterval(() => {
+                dispatch(end({ deviceNumber }))
+                console.log("first")
+              }, 10000)
+            })
+          )
+
+        } else {
+          const timeSetted = Number(endTime) - Number(new Date().getTime())
+
+          setTimeout(() => {
+            handleOpenTimeOut()
+            playSound(soundSrc)
+
+          }, timeSetted)
+        }
+      }
+    }
+
+  }, [defaultState])
 
 
 
@@ -130,6 +165,7 @@ const NewTime = ({ deviceNumber, handleOpenTimeOut, openTimeOut, setOpenTimeOut 
         deviceNumber,
         deviceStarted: true
       }));
+      dispatch(openSwitchSetter({ deviceNumber, openSwitch: false }))
       dispatch(start(deviceNumber));
       dispatch(
         end(
@@ -138,25 +174,27 @@ const NewTime = ({ deviceNumber, handleOpenTimeOut, openTimeOut, setOpenTimeOut 
             deviceNumber
           }
         ));
-      handleClose()
       setTimeout(() => {
         handleOpenTimeOut()
         playSound(soundSrc)
 
       }, timeSetted)
+      handleClose()
 
     } else {
       dispatch(started({
         deviceNumber,
         deviceStarted: true
-      }))
+      }));
+      dispatch(openSwitchSetter({ deviceNumber, openSwitch: true }))
+
 
       dispatch(start(deviceNumber));
       dispatch(end({ deviceNumber }));
       dispatch(
         timeIntervalId({
           deviceNumber,
-          intervalId: setInterval(() => { dispatch(end({ deviceNumber })) }, 3000)
+          intervalId: setInterval(() => { dispatch(end({ deviceNumber })) }, 5000)
         })
       )
 

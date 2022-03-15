@@ -11,7 +11,7 @@ import {
 
 export const playStateCollectionRef = collection(db, "playState")
 
-
+const stateID = "BLfLoVudoY8eP8lIiJ7b";
 class PlayStateService {
 
 
@@ -19,19 +19,19 @@ class PlayStateService {
         return addDoc(playStateCollectionRef, newState);
     }
 
-    updateState = (id, updatedState) => {
-        const stateDoc = doc(db, "playState", id);
+    updateState = (updatedState) => {
+        const stateDoc = doc(db, "playState", stateID);
         return updateDoc(stateDoc, updatedState)
     }
 
-    deleteState = (id) => {
-        const stateDoc = doc(db, "playState", id);
-        return deleteDoc(id)
+    deleteState = () => {
+        const stateDoc = doc(db, "playState", stateID);
+        return deleteDoc(stateID)
     };
 
 
-    getState = (id) => {
-        return getDoc(doc(db, "playState", id));
+    getState = () => {
+        return getDoc(doc(db, "playState", stateID));
     }
 
 }
